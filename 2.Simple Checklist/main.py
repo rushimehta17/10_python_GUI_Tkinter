@@ -31,16 +31,18 @@ output_frame.pack()
 button_frame.pack()
 
 #Input frame layout
-my_scrollbar = Scrollbar(output_frame)
 list_entry = Entry(input_frame, width=35, borderwidth=3, font=my_font)
 list_add_button = Button(input_frame, text='Add Item', borderwidth=2, font=my_font, bg=button_color, command=add_item)
 list_entry.grid(row=0, column=0, padx=5, pady=5)
 list_add_button.grid(row=0, column=1, padx=5, pady=5, ipadx=5)
-my_scrollbar.grid(row=0, column=1, sticky='NS')
 
 #output frsme layout
-my_listbox = Listbox(output_frame, height=15, width=45, borderwidth=3, font=my_font)
+my_scrollbar = Scrollbar(output_frame)
+my_listbox = Listbox(output_frame, height=15, width=45, borderwidth=3, font=my_font, yscrollcommand=my_scrollbar.set)
+#Link scroll bar to list box
+my_scrollbar.config(command=my_listbox.yview)
 my_listbox.grid(row=0, column=0)
+my_scrollbar.grid(row=0, column=1, sticky='NS')
 
 #Button frame layout
 list_remove_button = Button(button_frame, text='Remove Item', borderwidth=2, font=my_font, bg=button_color)
