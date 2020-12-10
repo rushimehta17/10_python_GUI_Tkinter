@@ -7,7 +7,7 @@ from PIL import ImageTk, Image
 
 root = Tk()
 root.title("Hello GUI World!")
-root.iconbitmap('0.Hello GUI World/wave.ico')
+root.iconbitmap('wave.ico')
 root.geometry('400x400')
 root.resizable(0,0)
 
@@ -54,7 +54,7 @@ normal_button.grid(row=1,column=0, padx=2,pady=2)
 upper_button.grid(row=1,column=1, padx=2,pady=2)
 
 #add image
-smile_img = ImageTk.PhotoImage(Image.open('0.Hello GUI World/smile.png'))
+smile_img = ImageTk.PhotoImage(Image.open('smile.png'))
 smile_label = Label(output_frame, image=smile_img, bg=output_color)
 smile_label.pack()
 
