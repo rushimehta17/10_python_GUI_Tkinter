@@ -2,7 +2,7 @@
 #icon http://www.doublejdesign.co.uk
 from tkinter import *
 from PIL import ImageTk, Image
-from tkinter import scrolledtext, messagebox
+from tkinter import scrolledtext, messagebox, filedialog
 
 #Define window
 root = Tk()
@@ -43,6 +43,40 @@ def close_note():
     if question == 1:
         root.destroy()
 
+def save_note():
+    """Save the given note. First three lines are saved as font family, font size and font option"""
+    #Use file dialog to get location and name of where/what to save the file as.
+    save_name = filedialog.asksaveasfilename(initialdir="4.notepad/", title="Save Note", filetypes=(("Text Files", "*.txt"),("All Files", "*.*")))
+    with open(save_name, "w") as f:
+        #First three lines are saved as font family, font size and font option. Font size must be a string not int.
+        f.write(font_family.get() + "\n")
+        f.write(str(font_size.get()) + "\n")
+        f.write(font_option.get() + "\n")
+
+        #Write remaining text in the field
+        f.write(input_text.get("1.0", END))
+
+def open_note():
+    """Open a previosuly saved note. First three lines are saved as font family, font size and font option. First set the font, then load the texts"""
+    #use file dialog to get location and note file
+    open_name = filedialog.askopenfilename(initialdir="4.notepad/", title="Open Note", filetypes=(("Text Files", "*.txt"),("All Files", "*.*")))
+    with open(open_name, "r") as f:
+        #Clear the current text
+        input_text.delete("1.0", END)
+
+        #First three lines are font_family, font_size and font_option... You must strip the new line char at the end of each liine!
+        font_family.set(f.readline().strip())
+        font_size.set(int(f.readline().strip()))
+        font_option.set(f.readline().strip())
+        
+        #call the change font for these .set() and pass an arbitary value
+        change_font(1)
+
+        #Read the rest of the file and insert it into the text field
+        text = f.read()
+        input_text.insert("1.0", text)
+
+
 
 #define the layout
 #Define frames
@@ -58,11 +92,11 @@ new_button = Button(menu_frame, image=new_image, command=new_note)
 new_button.grid(row=0, column=0, padx=5, pady=5)
 
 open_image = ImageTk.PhotoImage(Image.open('4.notepad/open.png'))
-open_button = Button(menu_frame, image=open_image)
+open_button = Button(menu_frame, image=open_image, command=open_note)
 open_button.grid(row=0, column=1, padx=5, pady=5)
 
 save_image = ImageTk.PhotoImage(Image.open('4.notepad/save.png'))
-save_button = Button(menu_frame, image=save_image)
+save_button = Button(menu_frame, image=save_image, command=save_note)
 save_button.grid(row=0, column=2, padx=5, pady=5)
 
 close_image = ImageTk.PhotoImage(Image.open('4.notepad/close.png'))
