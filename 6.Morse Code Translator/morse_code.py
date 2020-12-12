@@ -2,6 +2,7 @@
 #Icon found from http://icons8.com
 from tkinter import *
 from playsound import playsound
+from PIL import ImageTk, Image
 
 #Define window
 root = Tk()
@@ -113,6 +114,36 @@ def play():
         elif value == "|":
             root.after(700)
 
+def show_guide():
+    """Show morse code guide in a second window"""
+    #Image 'morse' needs to be a global variable to put on ouw window
+    #Window 'guide' needs to be global to close in another function
+    global morse
+    global guide
+
+    #Create second window relative to the root window
+    guide = Toplevel()
+    guide.title("Morse Guide")
+    guide.iconbitmap('6.Morse Code Translator/morse.ico')
+    guide.geometry('350x350+' + str(root.winfo_x()+500) + "+" + str(root.winfo_y()))
+    guide.config(bg=root_color)
+
+    #Create the image, label, and pack
+    morse = ImageTk.PhotoImage(Image.open('6.Morse Code Translator/morse_chart.jpg'))
+    label = Label(guide, image=morse, bg=frame_color)
+    label.pack(padx=10, pady=10, ipadx=5, ipady=5)
+
+    #Create a close button
+    close_button = Button(guide, text="Close", font=button_font, bg=button_color, command=hide_guide)
+    close_button.pack(padx=10, ipadx=50)
+
+    #Disable the guide button
+    guide_button.config(state=DISABLED)
+
+def hide_guide():
+    """Hide the guide"""
+    guide_button.config(state=NORMAL)
+    guide.destroy()
 
 #Create our morse code dictionaries
 english_to_morse = {'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..',
@@ -143,7 +174,7 @@ language = IntVar()
 language.set(1)
 morse_button = Radiobutton(input_frame, text="English --> Morse Code", variable=language, value=1, font=button_font, bg=frame_color)
 english_button = Radiobutton(input_frame, text="Morse Code --> English", variable=language, value=2, font=button_font, bg=frame_color)
-guide_button = Button(input_frame, text="Guide", font=button_font, bg=button_color)
+guide_button = Button(input_frame, text="Guide", font=button_font, bg=button_color, command=show_guide)
 
 morse_button.grid(row=0, column=0, pady=(15,0))
 english_button.grid(row=1, column=0)
