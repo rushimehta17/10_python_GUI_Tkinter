@@ -27,7 +27,7 @@ def search():
     #Get the api response
     #URL and my api key..... USE YOUR OWN API KEY!
     url = 'https://api.openweathermap.org/data/2.5/weather'
-    api_key = #use your own api key here
+    api_key = '647e1da6fd960749e7f9faabec255ebc'
 
     #Search by the appropriate query, either city name or zip
     if search_method.get() == 1:
