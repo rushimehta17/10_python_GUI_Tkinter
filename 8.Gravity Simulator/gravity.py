@@ -1,5 +1,6 @@
 #Gravity Simulator
 from tkinter import *
+from matplotlib import pyplot
 
 #Define window
 root = Tk()
@@ -13,6 +14,10 @@ root.resizable(0,0)
 
 #Define global variables
 time = 0
+data = {}
+for i in range(1,5):
+    data['data_%d' % i] = []
+
 
 #Define functions
 def move(event):
@@ -72,6 +77,15 @@ def step(t):
         velocities['v_%d' % i].delete(0, END)
         velocities['v_%d' % i].insert(0, str(round(-1*vf, 2)))
 
+        #Add data for the step to the data dict
+        data['data_%d' % i].append((time, 415 - main_canvas.coords(balls['ball_%d' % i])[3]))
+
+    #Update heights for the given time interval
+    update_height()
+
+    #update time
+    time += t
+
 def run():
     """Run the entire sim until all balls are at the ground or above the screen."""
     #Balls may start on the ground or at the top of the screen so call step() at least once
@@ -80,6 +94,52 @@ def run():
     #Run step() until all balls have hit the ground or left the screen based of the y2 coord [3]
     while 15 < main_canvas.coords(balls['ball_1'])[3] < 415 or 15 < main_canvas.coords(balls['ball_2'])[3] < 415 or 15 < main_canvas.coords(balls['ball_3'])[3] < 415 or 15 < main_canvas.coords(balls['ball_4'])[3] < 415:
         step(t_slider.get())
+
+def graph():
+    """Graph distance v time for 4 balls."""
+    #color of the balls corresponds to color of the graph
+    colors = ['red', 'green', 'blue', 'yellow']
+
+    for i in range(1,5):
+        #Initialize x,y values
+        x = []
+        y = []
+        #Add cooresponding data to x,y values
+        for data_list in data['data_%d' % i]:
+            x.append(data_list[0])
+            y.append(data_list[1])
+        #Plot data in corresponding color
+        pyplot.plot(x, y, color=colors[i-1])
+
+    #Graph formatting
+    pyplot.title('Distance Vs. Time')
+    pyplot.xlabel('Time')
+    pyplot.ylabel('Distance')
+    pyplot.show()
+
+def reset():
+    """Erase all "Dash" tags from canvas, set balls back to ground, and reset entry fields."""
+    global time
+
+    time = 0
+    main_canvas.delete("DASH")
+
+    #Clear each ball...
+    for i in range(1,5):
+        #Clear and set the velocity and accelerations
+        velocities['v_%d' % i].delete(0, END)
+        velocities['v_%d' % i].insert(0, '0')
+        accelerations['a_%d' % i].delete(0, END)
+        accelerations['a_%d' % i].insert(0, '0')
+
+        #Reset ball to starting position
+        main_canvas.coords(balls['ball_%d' % i], 45+(i-1)*100, 405, 55+(i-1)*100, 415)
+
+        #Clear data
+        data['data_%d' % i].clear()
+
+    update_height()
+    t_slider.set(1)
 
 #Define layout
 #Create frame
@@ -139,8 +199,8 @@ t_slider.set(1)
 #Buttons
 step_button = Button(input_frame, text='Step', command=lambda:step(t_slider.get()))
 run_button = Button(input_frame, text='Run', command=run)
-graph_button = Button(input_frame, text='Graph')
-reset_button = Button(input_frame, text='Reset')
+graph_button = Button(input_frame, text='Graph', command=graph)
+reset_button = Button(input_frame, text='Reset', command=reset)
 quit_button = Button(input_frame, text='Quit', command=root.destroy)
 
 #Make each ball 'dragable' in the vertical direction
