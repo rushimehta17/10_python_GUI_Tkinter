@@ -41,8 +41,45 @@ def update_height():
     for i in range(1,5):
         heights['height_%d' % i].config(text="Height: " + str(round(415 - main_canvas.coords(balls['ball_%d' % i])[3], 2)))
 
-def step():
-    
+def step(t):
+    """Advance the ball one 'step' based on the time slider value of t"""
+    global time
+
+    #loop through all 4 balls
+    for i in range(1,5):
+        #Do the PHYSICS! Negate a and v because canvas y values increase as you move down.
+        a = -1*float(accelerations['a_%d' % i].get())
+        v = -1*float(velocities['v_%d' % i].get())
+        d = v*t + .5*a*t**2
+
+        #Get the x coords for the current ball. These remain constant
+        x1 = main_canvas.coords(balls['ball_%d' % i])[0]
+        x2 = main_canvas.coords(balls['ball_%d' % i])[2]
+
+        #Move the given ball and create a dash line to mark the new position
+        if main_canvas.coords(balls['ball_%d' % i])[3] + d <=415:
+            main_canvas.move(balls['ball_%d' % i], 0, d)
+            y2 = main_canvas.coords(balls['ball_%d' % i])[3]
+            #Draw dash line at bottom of ball
+            main_canvas.create_line(x1, y2, x2, y2, tag='DASH')
+        #The ball has hit the ground
+        else:
+            main_canvas.coords(balls['ball_%d' % i], x1, 405, x2, 415)
+
+        #Do more PHYSICS
+        vf = v + a*t
+        #update velocity values for each ball
+        velocities['v_%d' % i].delete(0, END)
+        velocities['v_%d' % i].insert(0, str(round(-1*vf, 2)))
+
+def run():
+    """Run the entire sim until all balls are at the ground or above the screen."""
+    #Balls may start on the ground or at the top of the screen so call step() at least once
+    step(t_slider.get())
+
+    #Run step() until all balls have hit the ground or left the screen based of the y2 coord [3]
+    while 15 < main_canvas.coords(balls['ball_1'])[3] < 415 or 15 < main_canvas.coords(balls['ball_2'])[3] < 415 or 15 < main_canvas.coords(balls['ball_3'])[3] < 415 or 15 < main_canvas.coords(balls['ball_4'])[3] < 415:
+        step(t_slider.get())
 
 #Define layout
 #Create frame
@@ -100,8 +137,8 @@ t_slider.grid(row=3, column=1, columnspan=4, sticky='WE')
 t_slider.set(1)
 
 #Buttons
-step_button = Button(input_frame, text='Step')
-run_button = Button(input_frame, text='Run')
+step_button = Button(input_frame, text='Step', command=lambda:step(t_slider.get()))
+run_button = Button(input_frame, text='Run', command=run)
 graph_button = Button(input_frame, text='Graph')
 reset_button = Button(input_frame, text='Reset')
 quit_button = Button(input_frame, text='Quit', command=root.destroy)
